@@ -1,14 +1,23 @@
 package mdb
 
 import (
+	"os"
 	"testing"
 
 	"github.com/abdullin/lex-go/tuple"
 )
 
-func NewDbWithRange(t *testing.T, max int) (*DB, *Tx) {
+func getFolder(t *testing.T) (string, func()) {
+	file, err := os.Create("test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	return file.Name(), func() { os.RemoveAll("test") }
+}
 
-	f := getFolder()
+func NewDbWithRange(t *testing.T, max int) (*DB, *Tx) {
+	f, cleanup := getFolder(t)
+	defer cleanup()
 
 	cfg := NewConfig()
 	db, err := New(f, cfg)
