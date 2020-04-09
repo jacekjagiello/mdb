@@ -14,12 +14,10 @@ type Config struct {
 }
 
 func NewConfig() *Config {
-
 	return &Config{
 		EnvFlags: lmdb.NoSync,
 		SizeMbs:  1024,
 		Mode:     0644,
 		MaxDBs:   5,
 	}
-
 }

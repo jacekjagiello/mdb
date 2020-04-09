@@ -14,7 +14,7 @@ type DB struct {
 }
 
 // New creates a new DB wrapper around LMDB
-func New(folder string, cfg *Config) (*DB, error) {
+func New(folder, dbiName string, cfg *Config) (*DB, error) {
 	env, err := lmdb.NewEnv()
 
 	if err != nil {
@@ -50,7 +50,7 @@ func New(folder string, cfg *Config) (*DB, error) {
 
 	var dbi lmdb.DBI
 	err = env.Update(func(txn *lmdb.Txn) (err error) {
-		dbi, err = txn.CreateDBI("agg")
+		dbi, err = txn.CreateDBI(dbiName)
 		return err
 	})
 	if err != nil {

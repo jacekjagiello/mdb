@@ -1,6 +1,7 @@
 package mdb
 
 import (
+	"github.com/abdullin/lex-go/tuple"
 	"github.com/bmatsuo/lmdb-go/lmdb"
 	"github.com/pkg/errors"
 )
@@ -64,4 +65,8 @@ func (db *DB) CreateTransaction(flags uint) (tx *Tx, err error) {
 	}
 
 	return &Tx{db.DBI, db.Env, txn}, nil
+}
+
+func CreateKey(args ...tuple.Element) []byte {
+	return tuple.Tuple(args).Pack()
 }
