@@ -1,4 +1,4 @@
-module mdb
+module github.com/jacekjagiello/mdb
 
 go 1.14
 
