@@ -1,6 +1,10 @@
 package mdb
 
 import (
+	"bytes"
+	"fmt"
+
+	"github.com/abdullin/lex-go/tuple"
 	"github.com/bmatsuo/lmdb-go/lmdb"
 	"github.com/bmatsuo/lmdb-go/lmdbscan"
 	"github.com/pkg/errors"
@@ -90,4 +94,62 @@ func (tx *Tx) GetPrev(key []byte) (k, v []byte, err error) {
 	v = scanner.Val()
 	err = scanner.Err()
 	return
+}
+
+func (tx *Tx) FirstFromRange(key []byte) (k []byte, v interface{}, err error) {
+	kvs, err := tx.GetRange(key, RangeOptions{Limit: 1})
+	if err != nil {
+		return []byte{}, []byte{}, err
+	}
+
+	fmt.Printf("%+v", kvs[0].Value)
+
+	valTuple, err := tuple.Unpack(kvs[0].Value)
+	if err != nil {
+		return []byte{}, []byte{}, err
+	}
+
+	return kvs[0].Key, valTuple[0], nil
+}
+
+func (tx *Tx) Increment(key []byte) error {
+	currentValueBytes, err := tx.Get(key)
+	if err != nil {
+		return err
+	}
+
+	var currentValue uint64
+	if !bytes.Equal(currentValueBytes, []byte{}) {
+		currentValue = bytesToUint64(currentValueBytes)
+	}
+
+	newValue, err := uint64ToBytes(currentValue + 1)
+	if err != nil {
+		return err
+	}
+
+	return tx.Put(key, newValue)
+}
+
+func (tx *Tx) Decrement(key []byte) error {
+	currentValueBytes, err := tx.Get(key)
+	if err != nil {
+		return err
+	}
+
+	if bytes.Equal(currentValueBytes, []byte{}) {
+		val, err := uint64ToBytes(0)
+		if err != nil {
+			return err
+
+		}
+		return tx.Put(key, val)
+	}
+
+	newValue, err := uint64ToBytes(bytesToUint64(currentValueBytes) - 1)
+	if err != nil {
+		return err
+	}
+
+	return tx.Put(key, newValue)
 }

@@ -25,13 +25,9 @@ func (tx *Tx) GetRange(key []byte, opt RangeOptions) (kvs []KeyValue, err error)
 		return []KeyValue{}, nil
 	}
 
-	scans := 0
+	var scans int
 	for scanner.Scan() {
 		if !bytes.HasPrefix(scanner.Key(), key) {
-			break
-		}
-
-		if !opt.Reverse && opt.Limit != 0 && scans == opt.Limit {
 			break
 		}
 
@@ -39,7 +35,11 @@ func (tx *Tx) GetRange(key []byte, opt RangeOptions) (kvs []KeyValue, err error)
 			Key:   scanner.Key(),
 			Value: scanner.Val(),
 		})
+
 		scans++
+		if scans == opt.Limit {
+			break
+		}
 	}
 
 	// unfortunately reverse option requires reading all of the keys in given range

@@ -14,7 +14,6 @@ func (db *DB) CreateRead() (tx *Tx, err error) {
 
 func (db *DB) Read(fn TxOp) error {
 	return db.Env.View(func(t *lmdb.Txn) error {
-
 		tx := &Tx{db.DBI, db.Env, t}
 		if err := fn(tx); err != nil {
 			return errors.Wrap(err, "db.Env.View")
@@ -25,7 +24,6 @@ func (db *DB) Read(fn TxOp) error {
 
 func (db *DB) Update(fn TxOp) error {
 	return db.Env.Update(func(t *lmdb.Txn) error {
-
 		tx := &Tx{db.DBI, db.Env, t}
 		if err := fn(tx); err != nil {
 			return errors.Wrap(err, "db.Env.View")
@@ -40,7 +38,6 @@ func (db *DB) UpdateLocked(threadLocked bool, fn TxOp) error {
 	}
 
 	return db.Env.UpdateLocked(func(t *lmdb.Txn) error {
-
 		tx := &Tx{db.DBI, db.Env, t}
 		if err := fn(tx); err != nil {
 			return errors.Wrap(err, "db.Env.View")

@@ -6,7 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	proto "github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/proto"
 )
 
 func (tx *Tx) PutProto(key []byte, val proto.Message) error {
@@ -16,6 +16,7 @@ func (tx *Tx) PutProto(key []byte, val proto.Message) error {
 	if data, err = proto.Marshal(val); err != nil {
 		return errors.Wrap(err, "Marshal")
 	}
+
 	return tx.Put(key, data)
 }
 
@@ -59,5 +60,6 @@ func (tx *Tx) ReadGob(key []byte, obj interface{}) error {
 	if err := gob.NewDecoder(buf).Decode(obj); err != nil {
 		return err
 	}
+
 	return nil
 }

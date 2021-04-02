@@ -2,6 +2,8 @@ package mdb
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetNext(t *testing.T) {
@@ -32,4 +34,21 @@ func TestGetPrev(t *testing.T) {
 	if dk != 4 || dv != 4 {
 		t.Fatal("Expected key/value 4/4", "got", dk, dv)
 	}
+}
+
+func TestTx_Increment_Decrement(t *testing.T) {
+	db, tx := NewDbWithRange(t, 10)
+	defer db.Close()
+
+	key := []byte("key")
+
+	assert.NoError(t, tx.Increment(key))
+	assert.NoError(t, tx.Increment(key))
+	assert.NoError(t, tx.Increment(key))
+	assert.NoError(t, tx.Decrement(key))
+
+	data, err := tx.Get(key)
+	assert.NoError(t, err)
+
+	assert.Equal(t, uint64(2), bytesToUint64(data))
 }
